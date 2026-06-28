@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: stg_exchange_rates
+    columns:
+      - name: id
+        tests: [unique, not_null]
+      - name: rate
+        tests: [not_null]
+      - name: rate_date
+        tests: [not_null]
+      - name: base_currency
+        tests:
+          - accepted_values:
+              values: ['USD', 'GBP', 'EUR']
+  
+  - name: stg_inflation
+    columns:
+      - name: id
+        tests: [unique, not_null]
+      - name: inflation_rate_pct
+        tests: [not_null]
+  
+  - name: stg_interest_rates
+    columns: 
+      - name: id
+        tests: [unique, not_null]
+      - name: deposit_rate_pct
+        tests: [not_null]
+  
+  - name: stg_ngx_asi
+    columns:
+      - name: id
+        tests: [unique, not_null]
+      - name: index_date
+        tests: [unique, not_null]
+      - name: asi_value
+        tests: [not_null]
+  
+  - name: stg_gold_prices
+    columns:
+      - name: id
+        tests: [unique, not_null]
+      - name: gold_close_usd
+        tests: [not_null]
+      - name: source
+        tests: 
+          - accepted_values:
+              values: ['stooq', 'goldapi']

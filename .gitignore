@@ -1,0 +1,12 @@
+.env
+venv/
+__pycache__/
+*.pyc
+logs/
+config/
+profiles.yml
+Dockerfile
+docker-compose.yaml
+finance_dbt/target/
+finance_dbt/dbt_packages/
+finance_dbt/.user.yml

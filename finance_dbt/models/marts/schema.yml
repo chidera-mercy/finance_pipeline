@@ -1,0 +1,71 @@
+version: 2
+
+models:
+  - name: mart_purchasing_power
+    description: >
+      Shows how ₦1,000,000 loses real value each year due to inflation.
+      Answers: "What is my money actually worth after inflation?"
+    columns:
+      - name: year
+        tests: [unique, not_null]
+      - name: inflation_rate_pct
+        tests: [not_null]
+      - name: cumulative_inflation_factor
+        tests: [not_null]
+      - name: real_value_of_1m_naira
+        tests: [not_null]
+
+  - name: mart_fx_history
+    description: >
+      Monthly average FX rates with year-over-year change.
+      Answers: "How has the naira depreciated against major currencies?"
+    columns:
+      - name: month
+        tests: [not_null]
+      - name: base_currency
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['USD', 'GBP', 'EUR']
+      - name: avg_monthly_rate
+        tests: [not_null]
+
+  - name: mart_real_savings_return
+    description: >
+      Compares deposit interest rate to inflation each year.
+      Answers: "Are Nigerian savers gaining or losing in real terms?"
+    columns:
+      - name: year
+        tests: [unique, not_null]
+      - name: inflation_rate_pct
+        tests: [not_null]
+      - name: deposit_rate_pct
+        tests: [not_null]
+      - name: real_return_pct
+        tests: [not_null]
+      - name: real_return_flag
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['positive_real_return', 'negative_real_return']
+
+  - name: mart_returns_comparison
+    description: >
+      Daily value of ₦1,000,000 invested in USD, gold, and NGX equities
+      from the first date all three series overlap.
+      Answers: "Which asset has performed best for a Nigerian saver?"
+    columns:
+      - name: price_date
+        tests: [unique, not_null]
+      - name: usd_ngn_rate
+        tests: [not_null]
+      - name: gold_close_usd
+        tests: [not_null]
+      - name: asi_value
+        tests: [not_null]
+      - name: usd_position_ngn
+        tests: [not_null]
+      - name: gold_position_ngn
+        tests: [not_null]
+      - name: ngx_position_ngn
+        tests: [not_null]

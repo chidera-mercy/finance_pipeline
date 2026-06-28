@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: exchange_rates
+      - name: inflation
+      - name: interest_rates
+      - name: ngx_asi
+      - name: gold_prices
