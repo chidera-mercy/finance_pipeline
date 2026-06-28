@@ -93,7 +93,10 @@ def fetch_historical_close(for_date: date) -> float:
         response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         data = response.json()
-        return data["price"]
+        if "error" in data:
+            print(f"  No gold data for {for_date}: {data['error']}")
+            return None
+        return data.get("price_close") or data.get("close") or data.get("price")
     except requests.exceptions.RequestException as e:
         print(f"  Error fetching gold price for {for_date}: {e}")
         raise
@@ -104,6 +107,10 @@ def run(days_back: int = 1) -> None:
     """
     target_date = date.today() - timedelta(days=days_back)
     close_price = fetch_historical_close(target_date)
+
+    if close_price is None:
+        print(f"  No gold price available for {target_date} (weekend or holiday). Skipping.")
+        return
 
     conn = get_db_connection()
     try:
