@@ -23,7 +23,7 @@ This pipeline automates the collection of five streams of Nigerian macro-finance
 
 ## Architecture
 
-> *Image to be added.*
+![Data Architecture](docs/architecture_diagram.png)
 
 ---
 
