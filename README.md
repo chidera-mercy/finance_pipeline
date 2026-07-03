@@ -15,15 +15,18 @@ This pipeline automates the collection of five streams of Nigerian macro-finance
 
 ---
 
-## Dashboard Preview
-
-> *Screenshots to be added. See Section 5 of the project guide for step-by-step Metabase setup.*
-
----
-
 ## Architecture
 
 ![Data Architecture](docs/architecture_diagram.png)
+
+---
+
+## Dashboard Preview
+
+![Purchasing Power](docs/purchasing_decay.png)
+![Asset Returns](docs/asset_returns.png)
+![Real Ruturn](docs/real_return.png)
+![FX History](docs/fx_history.png)
 
 ---
 
