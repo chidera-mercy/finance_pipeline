@@ -4,6 +4,7 @@ Indicator FR.INR.DPST - deposit interest rate (%). the rate commercial
 banks pay on savings/time/demand deposits. No API key required.
 """
 import os
+from datetime import date
 
 from dotenv import load_dotenv
 import psycopg2
@@ -15,6 +16,7 @@ load_dotenv()
 WORLDBANK_BASE_URL = "https://api.worldbank.org/v2"
 INDICATOR = "FR.INR.DPST"
 RATE_TYPE = "deposit"
+START_YEAR = 2020
 REQUEST_TIMEOUT = 10
 
 def get_db_connection():
@@ -31,13 +33,13 @@ def get_db_connection():
 
 def fetch_interest_rates(country: str) -> list[tuple]:
     """
-    Fetch the 20 most recent annual deposit interest rates for a country.
+    Fetch the annual deposit interest rates for a country (2020 till currently available).
     """
     url = f"{WORLDBANK_BASE_URL}/country/{country}/indicator/{INDICATOR}"
     params = {
         "format": "json",
-        "mrv": 20,
-        "per_page": 20
+        "date": f"{START_YEAR}:{date.today().year}",
+        "per_page": 100
     }
     try:
         response = requests.get(url, params=params, timeout=10)
@@ -46,7 +48,7 @@ def fetch_interest_rates(country: str) -> list[tuple]:
         records = data[1]
         return [
             (r["country"]["id"], int(r["date"]), RATE_TYPE, r["value"])
-            for r in records
+            for r in records if r["value"] is not None
         ]
     except requests.exceptions.RequestException as e:
         print (f" Error fetching inflation data for {country}: {e}")
