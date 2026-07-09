@@ -3,10 +3,15 @@ WITH base AS (
     SELECT
         year,
         inflation_rate_pct,
-        EXP(SUM(LN(1 + inflation_rate_pct / 100.0))
-            OVER (ORDER BY year)) AS cumulative_inflation_factor
+        COALESCE(
+            EXP(
+                SUM(LN(1 + inflation_rate_pct / 100.0))
+                OVER (ORDER BY year ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+            ),
+            1.0
+        ) AS cumulative_inflation_factor
     FROM {{ ref('stg_inflation') }}
-    WHERE year >= 2019
+    WHERE year >= 2020
 )
 SELECT
     year,

@@ -41,7 +41,9 @@ models:
         tests: [not_null]
       - name: deposit_rate_pct
         tests: [not_null]
-      - name: real_return_pct
+      - name: approx_real_return_pct
+        tests: [not_null]
+      - name: fisher_real_return_pct
         tests: [not_null]
       - name: real_return_flag
         tests:
@@ -69,3 +71,130 @@ models:
         tests: [not_null]
       - name: ngx_position_ngn
         tests: [not_null]
+  
+  - name: mart_fx_volatility
+    description: >
+      Rolling 30-day annualised volatility of daily FX log-returns,
+      per currency pair.
+    columns:
+      - name: base_currency
+        description: Base currency of the pair (USD, GBP, EUR)
+        tests:
+          - not_null
+      - name: rate_date
+        description: Date of the exchange rate observation
+        tests:
+          - not_null
+      - name: rate
+        description: The exchange rate on that date
+        tests:
+          - not_null
+      - name: rolling_30d_annualized_volatility_pct
+        description: >
+          Annualised standard deviation of daily log-returns over the
+          trailing 30 observations, as a percentage. Null for a
+          currency's very first observation (no prior return exists).
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - base_currency
+            - rate_date
+
+  - name: mart_gold_ngn
+    description: >
+      Gold spot price converted to naira per troy ounce and per gram,
+      using the most recent available USD/NGN rate on or before each
+      gold price date.
+    columns:
+      - name: price_date
+        description: Date of the gold price observation
+        tests:
+          - not_null
+          - unique
+      - name: gold_close_usd
+        description: Gold close price in USD per troy ounce
+        tests:
+          - not_null
+      - name: usd_ngn_rate
+        description: USD/NGN rate used for the conversion (forward-filled)
+        tests:
+          - not_null
+      - name: gold_price_ngn_per_oz
+        description: Gold price in naira per troy ounce
+        tests:
+          - not_null
+      - name: gold_price_ngn_per_gram
+        description: Gold price in naira per gram
+        tests:
+          - not_null
+
+  - name: mart_ngx_drawdown
+    description: >
+      NGX All-Share Index running peak-to-date and drawdown from that
+      peak, for every trading day.
+    columns:
+      - name: index_date
+        description: NGX trading day
+        tests:
+          - not_null
+          - unique
+      - name: asi_value
+        description: NGX All-Share Index value on that day
+        tests:
+          - not_null
+      - name: running_peak_to_date
+        description: Highest ASI value observed on or before this date
+        tests:
+          - not_null
+      - name: drawdown_from_peak_pct
+        description: >
+          Percentage below the running peak (always <= 0 by
+          construction, since the peak is itself the max seen so far)
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              max_value: 0
+
+  - name: mart_annual_summary
+    description: >
+      One row per year combining inflation, deposit rate, and
+      year-end FX/gold/NGX values with year-over-year change, for a
+      dashboard year-selector view.
+    columns:
+      - name: year
+        description: Calendar year
+        tests:
+          - not_null
+          - unique
+      - name: inflation_rate_pct
+        description: Annual CPI inflation for Nigeria
+        tests:
+          - not_null
+
+  - name: mart_asset_correlation
+    description: >
+      Single-row summary of the correlation between naira, gold, and
+      NGX ASI monthly returns across the full history ingested so far.
+    columns:
+      - name: usd_gold_correlation
+        description: Correlation between USD/NGN and gold monthly returns
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: -1
+              max_value: 1
+      - name: usd_asi_correlation
+        description: Correlation between USD/NGN and NGX ASI monthly returns
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: -1
+              max_value: 1
+      - name: gold_asi_correlation
+        description: Correlation between gold and NGX ASI monthly returns
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: -1
+              max_value: 1
+      - name: months_used
+        description: Number of months with valid returns for all 3 series
+        tests:
+          - not_null
