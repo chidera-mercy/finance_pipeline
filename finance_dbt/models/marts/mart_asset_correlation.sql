@@ -9,15 +9,21 @@
 
 WITH bounds AS (
     SELECT
-        LEAST(
-            MIN(rate_date), MIN(price_date), MIN(index_date)
-        ) AS min_date,
-        GREATEST(
-            MAX(rate_date), MAX(price_date), MAX(index_date)
-        ) AS max_date
-    FROM {{ ref('stg_exchange_rates') }}
-    CROSS JOIN {{ ref('stg_gold_prices') }}
-    CROSS JOIN {{ ref('stg_ngx_asi') }}
+        MIN(y) AS min_date,
+        MAX(y) AS max_date
+    FROM (
+        SELECT MIN(rate_date) AS y FROM {{ ref('stg_exchange_rates') }}
+        UNION ALL
+        SELECT MAX(rate_date) FROM {{ ref('stg_exchange_rates') }}
+        UNION ALL
+        SELECT MIN(price_date) FROM {{ ref('stg_gold_prices') }}
+        UNION ALL
+        SELECT MAX(price_date) FROM {{ ref('stg_gold_prices') }}
+        UNION ALL
+        SELECT MIN(index_date) FROM {{ ref('stg_ngx_asi') }}
+        UNION ALL
+        SELECT MAX(index_date) FROM {{ ref('stg_ngx_asi') }}
+    ) all_dates
 ),
 month_ends AS (
     SELECT (generate_series(
@@ -28,37 +34,28 @@ month_ends AS (
     FROM bounds
 ),
 fx_monthly AS (
-    SELECT 
-        me.month_end, 
-        fx_rate AS usd_ngn_rate
+    SELECT me.month_end, fx.rate AS usd_ngn_rate
     FROM month_ends me
     LEFT JOIN LATERAL (
-        SELECT rate 
-        FROM {{ ref('stg_exchange_rates') }}
+        SELECT rate FROM {{ ref('stg_exchange_rates') }}
         WHERE base_currency = 'USD' AND rate_date <= me.month_end
         ORDER BY rate_date DESC LIMIT 1
     ) fx ON TRUE
 ),
 gold_monthly AS (
-    SELECT 
-        me.month_end, 
-        g.gold_close_usd
+    SELECT me.month_end, g.gold_close_usd
     FROM month_ends me
     LEFT JOIN LATERAL (
-        SELECT gold_close_usd 
-        FROM {{ ref('stg_gold_prices') }}
+        SELECT gold_close_usd FROM {{ ref('stg_gold_prices') }}
         WHERE price_date <= me.month_end
         ORDER BY price_date DESC LIMIT 1
     ) g ON TRUE
 ),
 asi_monthly AS (
-    SELECT 
-        me.month_end, 
-        a.asi_value
+    SELECT me.month_end, a.asi_value
     FROM month_ends me
     LEFT JOIN LATERAL (
-        SELECT asi_value 
-        FROM {{ ref('stg_ngx_asi') }}
+        SELECT asi_value FROM {{ ref('stg_ngx_asi') }}
         WHERE index_date <= me.month_end
         ORDER BY index_date DESC LIMIT 1
     ) a ON TRUE
@@ -69,7 +66,7 @@ combined AS (
         f.usd_ngn_rate,
         g.gold_close_usd,
         a.asi_value
-    FROM fx_monthy f
+    FROM fx_monthly f
     JOIN gold_monthly g USING (month_end)
     JOIN asi_monthly a USING (month_end)
     WHERE f.usd_ngn_rate IS NOT NULL

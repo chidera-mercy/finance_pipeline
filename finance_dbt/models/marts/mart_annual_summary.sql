@@ -15,14 +15,14 @@ WITH fx_year_end AS (
 gold_year_end AS (
     SELECT DISTINCT ON (EXTRACT(YEAR FROM price_date))
         EXTRACT(YEAR FROM price_date)::INT AS year,
-        glose_close_usd AS year_end_gold_usd
+        gold_close_usd AS year_end_gold_usd
     FROM {{ ref('stg_gold_prices') }}
     ORDER BY EXTRACT(YEAR FROM price_date), price_date DESC
 ),
 asi_year_end AS (
     SELECT DISTINCT ON (EXTRACT(YEAR FROM index_date))
-        EXTRACT(YEAR FROM index_date),
-        asi_value AS yeat_end_asi
+        EXTRACT(YEAR FROM index_date) AS year,
+        asi_value AS year_end_asi
     FROM {{ ref('stg_ngx_asi') }}
     ORDER BY EXTRACT(YEAR FROM index_date), index_date DESC
 ),

@@ -5,11 +5,12 @@ import os
 from contextlib import contextmanager
 from dotenv import load_dotenv
 import psycopg2
+from psycopg2 import pool
 
 load_dotenv()
 
 
-_pool: psycopg2.pool.SimpleConnectionPool | None = None
+_pool: pool.SimpleConnectionPool | None = None
 
 def init_pool(minconn: int = 1, maxconn: int = 10) -> None:
     """Create the global connection pool. Call once on app startup."""
@@ -17,7 +18,7 @@ def init_pool(minconn: int = 1, maxconn: int = 10) -> None:
     if _pool is not None:
         return
     
-    _pool = psycopg2.pool.SimpleConnectionPool(
+    _pool = pool.SimpleConnectionPool(
         minconn,
         maxconn,
         host=os.getenv("DB_HOST"),

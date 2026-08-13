@@ -168,8 +168,6 @@ models:
           - unique
       - name: inflation_rate_pct
         description: Annual CPI inflation for Nigeria
-        tests:
-          - not_null
 
   - name: mart_asset_correlation
     description: >

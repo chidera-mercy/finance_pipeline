@@ -23,10 +23,10 @@ This pipeline automates the collection of five streams of Nigerian macro-finance
 
 ## Dashboard Preview
 
-![Purchasing Power](docs/purchasing_decay.png)
-![Asset Returns](docs/asset_returns.png)
-![Real Ruturn](docs/real_return.png)
-![FX History](docs/fx_history.png)
+![Executive Overview](docs/executive_overview.png)
+![Trends](docs/trends.png)
+![Purchasing Power & Savings](docs/purchasing_power_and_savings.png)
+![Annual Summary](docs/annual_summary.png)
 
 ---
 
@@ -42,6 +42,16 @@ This pipeline automates the collection of five streams of Nigerian macro-finance
 | Containerisation | Docker + Docker Compose | Reproducible Airflow and Metabase environments |
 
 ---
+
+### Manual Trigger Airflow DAG Run
+![Airflow Run](docs/airflow-run.png)
+
+### FastAPI docs
+![FastAPI docs](docs/fastapi_docs.png)
+
+### FastAPI pytest
+![Pytest Passed](docs/pytest_passed.png)
+
 
 ## Data Sources
 
@@ -294,18 +304,6 @@ finance_pipeline/
 │
 └── logs/                        
 ```
-
----
-
-## Future Improvements
-
-- [ ] Perform more analysis and draw more insights from the data
-- [ ] Track additional currencies (GBP/NGN, EUR/NGN) in the asset comparison chart
-- [ ] Add a T-bill / FGN bond yield source to compare with deposit rates
-- [ ] Deploy to a cloud PostgreSQL instance so the dashboard is publicly accessible
-- [ ] Containerise the entire pipeline (ingest scripts + dbt) alongside Airflow so setup requires only `docker compose up`
-
----
 
 ---
 

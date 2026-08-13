@@ -17,7 +17,7 @@ WORLDBANK_BASE_URL = "https://api.worldbank.org/v2"
 INDICATOR = "FR.INR.DPST"
 RATE_TYPE = "deposit"
 START_YEAR = 2020
-REQUEST_TIMEOUT = 10
+REQUEST_TIMEOUT = 30
 
 def get_db_connection():
     """
